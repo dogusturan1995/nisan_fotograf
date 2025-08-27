@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nişan Fotoğraf Paylaşım</title>
     
-    <!-- Google API -->
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
     <style>
         * {
             margin: 0;
@@ -21,74 +17,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
-        }
-
-        /* Config Panel - Sadece ilk kurulumda görünür */
-        .config-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
-            z-index: 2000;
-            display: none;
-        }
-
-        .config-panel.show {
-            display: block;
-        }
-
-        .config-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .config-title {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            color: #f39c12;
-        }
-
-        .config-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .config-input {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .config-input label {
-            font-size: 0.9em;
-            margin-bottom: 5px;
-            color: #ecf0f1;
-        }
-
-        .config-input input {
-            padding: 8px;
-            border: none;
-            border-radius: 5px;
-            background: #34495e;
-            color: white;
-        }
-
-        .config-button {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-
-        .config-button:hover {
-            background: #229954;
         }
 
         /* Ana Karşılama Ekranı */
@@ -120,7 +48,7 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
         }
 
         .welcome-image img {
@@ -131,9 +59,6 @@
 
         .welcome-image-placeholder {
             font-size: 100px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             animation: pulse 2s infinite;
         }
 
@@ -228,6 +153,7 @@
             padding: 20px;
             text-align: center;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .back-btn {
@@ -447,11 +373,6 @@
             margin-bottom: 8px;
         }
 
-        .photo-actions {
-            display: flex;
-            gap: 10px;
-        }
-
         .download-btn {
             background: white;
             color: #764ba2;
@@ -460,7 +381,7 @@
             border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
-            flex: 1;
+            width: 100%;
             transition: all 0.3s;
         }
 
@@ -469,7 +390,7 @@
             color: white;
         }
 
-        /* Loading ve Success States */
+        /* Loading ve Messages */
         .loading-spinner {
             display: none;
             position: fixed;
@@ -507,7 +428,7 @@
             color: #666;
         }
 
-        .success-message, .error-message {
+        .message {
             display: none;
             position: fixed;
             top: 20px;
@@ -517,16 +438,16 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             animation: slideInRight 0.5s ease;
             z-index: 1000;
-        }
-
-        .success-message {
             background: #4caf50;
             color: white;
         }
 
-        .error-message {
+        .message.error {
             background: #f44336;
-            color: white;
+        }
+
+        .message.show {
+            display: block;
         }
 
         @keyframes slideInRight {
@@ -534,12 +455,9 @@
             to { transform: translateX(0); }
         }
 
-        .success-message.show, .error-message.show {
-            display: block;
-        }
-
         /* Empty State */
         .empty-gallery {
+            grid-column: 1 / -1;
             text-align: center;
             padding: 60px 20px;
             color: #999;
@@ -572,89 +490,19 @@
                 gap: 10px;
                 padding: 20px 10px;
             }
-
-            .config-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Google Sign In Button */
-        .google-signin-btn {
-            background: white;
-            color: #444;
-            border: 1px solid #ddd;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1em;
-            transition: all 0.3s;
-            margin: 20px 0;
-        }
-
-        .google-signin-btn:hover {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            background: #f8f8f8;
-        }
-
-        .auth-required {
-            text-align: center;
-            padding: 40px 20px;
-            background: #f5f5f5;
-            border-radius: 10px;
-            margin: 20px;
-        }
-
-        .auth-required h3 {
-            color: #764ba2;
-            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <!-- Konfigürasyon Paneli -->
-    <div class="config-panel" id="configPanel">
-        <div class="config-content">
-            <div class="config-title">⚙️ Sistemi Yapılandırın</div>
-            <div class="config-grid">
-                <div class="config-input">
-                    <label>Gelin İsmi</label>
-                    <input type="text" id="brideName" placeholder="Örn: Ayşe">
-                </div>
-                <div class="config-input">
-                    <label>Damat İsmi</label>
-                    <input type="text" id="groomName" placeholder="Örn: Mehmet">
-                </div>
-                <div class="config-input">
-                    <label>Etkinlik Tarihi</label>
-                    <input type="text" id="eventDate" placeholder="Örn: 15 Şubat 2025">
-                </div>
-                <div class="config-input">
-                    <label>Google Drive Klasör ID</label>
-                    <input type="text" id="driveFolderId" placeholder="Drive klasör ID'sini yapıştırın">
-                </div>
-            </div>
-            <div>
-                <button class="config-button" onclick="saveConfig()">Ayarları Kaydet</button>
-                <button class="config-button" style="background: #e74c3c;" onclick="closeConfig()">Kapat</button>
-            </div>
-            <div style="margin-top: 15px; font-size: 0.85em; color: #95a5a6;">
-                💡 İpucu: Drive klasör ID'sini almak için: Klasörü açın → URL'den /folders/ sonraki kısmı kopyalayın
-            </div>
-        </div>
-    </div>
-
     <!-- Karşılama Ekranı -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-image" id="welcomeImage">
             <div class="welcome-image-placeholder">❤️</div>
         </div>
         <div class="welcome-text">
-            <h1 class="couple-names" id="coupleNames">Sinem & Doğuş</h1>
-            <p class="event-date" id="eventDateDisplay">13 Eylül 2025</p>
-            <p class="welcome-message">Mutluluğumuzu ve anılarınızı paylaştığınız için teşekkür ederiz :)</p>
+            <h1 class="couple-names">Ayşe & Mehmet</h1>
+            <p class="event-date">15 Şubat 2025</p>
+            <p class="welcome-message">Mutluluğumuzu paylaştığınız için teşekkür ederiz</p>
         </div>
         <div class="action-buttons">
             <button class="action-btn upload-btn" onclick="showUploadScreen()">
@@ -664,14 +512,11 @@
                 🖼️ Albümü Görüntüle
             </button>
         </div>
-        
-        <!-- Ayarlar butonu (sağ alt köşe) -->
-        <button onclick="showConfig()" style="position: fixed; bottom: 20px; right: 20px; background: #34495e; color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; width: 50px; height: 50px; font-size: 20px;">⚙️</button>
     </div>
 
     <!-- Fotoğraf Yükleme Ekranı -->
     <div class="upload-screen" id="uploadScreen">
-        <div class="header" style="position: relative;">
+        <div class="header">
             <button class="back-btn" onclick="showWelcomeScreen()">← Geri</button>
             <h2>Fotoğraf Yükle</h2>
         </div>
@@ -680,49 +525,36 @@
                 <input type="text" class="name-input" id="uploaderName" placeholder="İsminizi yazın (Örn: Ali Veli)">
             </div>
             
-            <div id="authRequiredUpload" class="auth-required" style="display: none;">
-                <h3>Google Drive'a Yüklemek İçin Giriş Yapın</h3>
-                <button class="google-signin-btn" onclick="handleAuthClick()">
-                    <img src="https://www.google.com/favicon.ico" width="20" height="20" alt="Google">
-                    Google ile Giriş Yap
-                </button>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Fotoğraf seçmek için tıklayın</div>
+                <div class="upload-hint">veya sürükleyip bırakın</div>
+                <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
             </div>
             
-            <div id="uploadAreaContainer">
-                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-                    <div class="upload-icon">📷</div>
-                    <div class="upload-text">Fotoğraf seçmek için tıklayın</div>
-                    <div class="upload-hint">veya sürükleyip bırakın</div>
-                    <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
-                </div>
-                
-                <div class="preview-container" id="previewContainer">
-                    <h3 style="color: #764ba2; margin-bottom: 15px;">Seçilen Fotoğraflar:</h3>
-                    <div class="preview-grid" id="previewGrid"></div>
-                    <button class="upload-final-btn" id="uploadBtn" onclick="uploadPhotos()">
-                        Fotoğrafları Yükle
-                    </button>
-                </div>
+            <div class="preview-container" id="previewContainer">
+                <h3 style="color: #764ba2; margin-bottom: 15px;">Seçilen Fotoğraflar:</h3>
+                <div class="preview-grid" id="previewGrid"></div>
+                <button class="upload-final-btn" id="uploadBtn" onclick="uploadPhotos()">
+                    Fotoğrafları Yükle
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Galeri Ekranı -->
     <div class="gallery-screen" id="galleryScreen">
-        <div class="header" style="position: relative;">
+        <div class="header">
             <button class="back-btn" onclick="showWelcomeScreen()">← Geri</button>
             <h2>Fotoğraf Galerisi</h2>
         </div>
-        
-        <div id="authRequiredGallery" class="auth-required" style="display: none;">
-            <h3>Fotoğrafları Görmek İçin Giriş Yapın</h3>
-            <button class="google-signin-btn" onclick="handleAuthClick()">
-                <img src="https://www.google.com/favicon.ico" width="20" height="20" alt="Google">
-                Google ile Giriş Yap
-            </button>
+        <div class="gallery-grid" id="galleryGrid">
+            <div class="empty-gallery">
+                <div class="empty-gallery-icon">📷</div>
+                <h3>Henüz fotoğraf yüklenmemiş</h3>
+                <p>İlk fotoğrafı yükleyen siz olun!</p>
+            </div>
         </div>
-        
-        <div class="gallery-grid" id="galleryGrid"></div>
     </div>
 
     <!-- Loading Spinner -->
@@ -731,99 +563,49 @@
         <div class="loading-text" id="loadingText">Yükleniyor...</div>
     </div>
 
-    <!-- Success Message -->
-    <div class="success-message" id="successMessage">
-        ✓ İşlem başarıyla tamamlandı!
-    </div>
-
-    <!-- Error Message -->
-    <div class="error-message" id="errorMessage">
-        ⚠️ Bir hata oluştu!
-    </div>
+    <!-- Message -->
+    <div class="message" id="message"></div>
 
     <script>
-        // Konfigürasyon
-        let config = {
-            brideName: localStorage.getItem('brideName') || 'Gelin',
-            groomName: localStorage.getItem('groomName') || 'Damat',
-            eventDate: localStorage.getItem('eventDate') || 'Özel Gün',
-            driveFolderId: localStorage.getItem('driveFolderId') || '',
-            welcomeImageUrl: localStorage.getItem('welcomeImageUrl') || ''
-        };
-
-        // Google API Configuration
-        const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'; // Buraya kendi Client ID'nizi koyun
-        const API_KEY = 'YOUR_API_KEY'; // Buraya kendi API Key'inizi koyun
-        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
-        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-
-        let tokenClient;
-        let gapiInited = false;
-        let gisInited = false;
+        // Global değişkenler
         let selectedFiles = [];
+        let uploadedPhotos = [];
+
+        // LocalStorage'dan fotoğrafları yükle
+        function loadPhotosFromStorage() {
+            const stored = localStorage.getItem('weddingPhotos');
+            if (stored) {
+                try {
+                    uploadedPhotos = JSON.parse(stored);
+                } catch (e) {
+                    uploadedPhotos = [];
+                }
+            }
+        }
+
+        // LocalStorage'a fotoğrafları kaydet
+        function savePhotosToStorage() {
+            localStorage.setItem('weddingPhotos', JSON.stringify(uploadedPhotos));
+        }
 
         // Sayfa yüklendiğinde
-        window.onload = function() {
-            loadConfig();
-            checkFirstTime();
-            initializeGoogleAPI();
-        };
-
-        // İlk kullanım kontrolü
-        function checkFirstTime() {
-            if (!config.driveFolderId || config.driveFolderId === '') {
-                showConfig();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPhotosFromStorage();
+            
+            // Dosya input event listener
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) {
+                fileInput.addEventListener('change', handleFileSelect);
             }
-        }
 
-        // Konfigürasyonu yükle
-        function loadConfig() {
-            document.getElementById('coupleNames').textContent = `${config.brideName} & ${config.groomName}`;
-            document.getElementById('eventDateDisplay').textContent = config.eventDate;
-            
-            if (config.welcomeImageUrl) {
-                document.getElementById('welcomeImage').innerHTML = `<img src="${config.welcomeImageUrl}" alt="Welcome">`;
+            // Upload area drag & drop
+            const uploadArea = document.getElementById('uploadArea');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', handleDragOver);
+                uploadArea.addEventListener('dragleave', handleDragLeave);
+                uploadArea.addEventListener('drop', handleDrop);
             }
-        }
-
-        // Konfigürasyon panelini göster
-        function showConfig() {
-            document.getElementById('configPanel').classList.add('show');
-            document.getElementById('brideName').value = config.brideName;
-            document.getElementById('groomName').value = config.groomName;
-            document.getElementById('eventDate').value = config.eventDate;
-            document.getElementById('driveFolderId').value = config.driveFolderId;
-        }
-
-        // Konfigürasyonu kaydet
-        function saveConfig() {
-            config.brideName = document.getElementById('brideName').value || 'Gelin';
-            config.groomName = document.getElementById('groomName').value || 'Damat';
-            config.eventDate = document.getElementById('eventDate').value || 'Özel Gün';
-            config.driveFolderId = document.getElementById('driveFolderId').value;
-            
-            // LocalStorage'a kaydet
-            localStorage.setItem('brideName', config.brideName);
-            localStorage.setItem('groomName', config.groomName);
-            localStorage.setItem('eventDate', config.eventDate);
-            localStorage.setItem('driveFolderId', config.driveFolderId);
-            
-            loadConfig();
-            closeConfig();
-            showMessage('Ayarlar kaydedildi!', 'success');
-        }
-
-        // Konfigürasyon panelini kapat
-        function closeConfig() {
-            document.getElementById('configPanel').classList.remove('show');
-        }
-
-        // Google API Initialization
-        function initializeGoogleAPI() {
-            // Bu fonksiyon Google API'yi başlatır
-            // Gerçek uygulamada CLIENT_ID ve API_KEY doldurulmalı
-            console.log('Google API başlatılıyor...');
-        }
+        });
 
         // Ekran geçişleri
         function showWelcomeScreen() {
@@ -833,24 +615,12 @@
         }
 
         function showUploadScreen() {
-            if (!config.driveFolderId) {
-                showMessage('Lütfen önce ayarlardan Drive klasör ID\'sini girin!', 'error');
-                showConfig();
-                return;
-            }
-            
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('uploadScreen').style.display = 'block';
             document.getElementById('galleryScreen').style.display = 'none';
         }
 
         function showGalleryScreen() {
-            if (!config.driveFolderId) {
-                showMessage('Lütfen önce ayarlardan Drive klasör ID\'sini girin!', 'error');
-                showConfig();
-                return;
-            }
-            
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('uploadScreen').style.display = 'none';
             document.getElementById('galleryScreen').style.display = 'block';
@@ -858,8 +628,6 @@
         }
 
         // Dosya seçimi
-        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
-
         function handleFileSelect(e) {
             const files = Array.from(e.target.files);
             files.forEach(file => {
@@ -871,21 +639,19 @@
             updatePreviewVisibility();
         }
 
-        // Drag & Drop
-        const uploadArea = document.getElementById('uploadArea');
-
-        uploadArea.addEventListener('dragover', (e) => {
+        // Drag & Drop fonksiyonları
+        function handleDragOver(e) {
             e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
+            e.currentTarget.classList.add('dragover');
+        }
 
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
 
-        uploadArea.addEventListener('drop', (e) => {
+        function handleDrop(e) {
             e.preventDefault();
-            uploadArea.classList.remove('dragover');
+            e.currentTarget.classList.remove('dragover');
             
             const files = Array.from(e.dataTransfer.files);
             files.forEach(file => {
@@ -895,7 +661,7 @@
                 }
             });
             updatePreviewVisibility();
-        });
+        }
 
         // Önizleme gösterimi
         function displayPreview(file) {
@@ -905,6 +671,7 @@
             reader.onload = function(e) {
                 const previewItem = document.createElement('div');
                 previewItem.className = 'preview-item';
+                previewItem.setAttribute('data-filename', file.name);
                 previewItem.innerHTML = `
                     <img src="${e.target.result}" class="preview-img" alt="Preview">
                     <button class="remove-btn" onclick="removePhoto(this, '${file.name}')">×</button>
@@ -937,12 +704,12 @@
 
         // Mesaj gösterme
         function showMessage(text, type = 'success') {
-            const messageEl = type === 'success' ? 
-                document.getElementById('successMessage') : 
-                document.getElementById('errorMessage');
-            
+            const messageEl = document.getElementById('message');
             messageEl.textContent = text;
-            messageEl.classList.add('show');
+            messageEl.className = 'message show';
+            if (type === 'error') {
+                messageEl.classList.add('error');
+            }
             
             setTimeout(() => {
                 messageEl.classList.remove('show');
@@ -959,39 +726,47 @@
             document.getElementById('loadingSpinner').classList.remove('active');
         }
 
-        // Fotoğraf yükleme - Firebase Storage kullanımı
-        async function uploadPhotos() {
+        // Fotoğraf yükleme
+        function uploadPhotos() {
             const uploaderName = document.getElementById('uploaderName').value.trim();
             
             if (!uploaderName) {
-                showMessage('Lütfen isminizi yazın!', 'error');
+                showMessage('⚠️ Lütfen isminizi yazın!', 'error');
+                document.getElementById('uploaderName').focus();
                 return;
             }
             
             if (selectedFiles.length === 0) {
-                showMessage('Lütfen en az bir fotoğraf seçin!', 'error');
+                showMessage('⚠️ Lütfen en az bir fotoğraf seçin!', 'error');
                 return;
             }
             
             showLoading('Fotoğraflar yükleniyor...');
             
-            try {
-                // Simüle edilmiş yükleme - Gerçek uygulamada Firebase Storage kullanılacak
-                for (let i = 0; i < selectedFiles.length; i++) {
-                    const file = selectedFiles[i];
-                    
-                    // Dosya adını hazırla
-                    const timestamp = new Date().getTime();
-                    const fileName = `${uploaderName}_${timestamp}_${file.name}`;
-                    
-                    // Burada normalde Firebase Storage'a yükleme yapılacak
-                    await simulateUpload(file, fileName, uploaderName);
-                    
-                    showLoading(`${i + 1}/${selectedFiles.length} yükleniyor...`);
-                }
-                
+            // Her fotoğraf için
+            let uploadPromises = selectedFiles.map((file, index) => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const photoData = {
+                            id: Date.now() + '_' + index,
+                            uploaderName: uploaderName,
+                            uploadDate: new Date().toISOString(),
+                            dataUrl: e.target.result,
+                            fileName: file.name
+                        };
+                        uploadedPhotos.push(photoData);
+                        resolve();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+            
+            // Tüm yüklemeler bittiğinde
+            Promise.all(uploadPromises).then(() => {
+                savePhotosToStorage();
                 hideLoading();
-                showMessage(`${selectedFiles.length} fotoğraf başarıyla yüklendi!`, 'success');
+                showMessage(`✓ ${selectedFiles.length} fotoğraf başarıyla yüklendi!`, 'success');
                 
                 // Temizle
                 selectedFiles = [];
@@ -1000,31 +775,10 @@
                 document.getElementById('uploaderName').value = '';
                 updatePreviewVisibility();
                 
-            } catch (error) {
-                hideLoading();
-                showMessage('Yükleme sırasında bir hata oluştu!', 'error');
-                console.error('Upload error:', error);
-            }
-        }
-
-        // Simüle edilmiş yükleme fonksiyonu
-        function simulateUpload(file, fileName, uploaderName) {
-            return new Promise((resolve) => {
+                // 2 saniye sonra galeriye git
                 setTimeout(() => {
-                    console.log(`Uploaded: ${fileName} by ${uploaderName}`);
-                    
-                    // LocalStorage'da geçici olarak sakla (gerçek uygulamada Firebase kullanılacak)
-                    const photos = JSON.parse(localStorage.getItem('weddingPhotos') || '[]');
-                    photos.push({
-                        fileName: fileName,
-                        uploaderName: uploaderName,
-                        uploadDate: new Date().toISOString(),
-                        url: URL.createObjectURL(file) // Geçici URL
-                    });
-                    localStorage.setItem('weddingPhotos', JSON.stringify(photos));
-                    
-                    resolve();
-                }, 1000);
+                    showGalleryScreen();
+                }, 2000);
             });
         }
 
@@ -1032,10 +786,7 @@
         function loadGalleryPhotos() {
             const galleryGrid = document.getElementById('galleryGrid');
             
-            // LocalStorage'dan fotoğrafları al (gerçek uygulamada Firebase'den gelecek)
-            const photos = JSON.parse(localStorage.getItem('weddingPhotos') || '[]');
-            
-            if (photos.length === 0) {
+            if (uploadedPhotos.length === 0) {
                 galleryGrid.innerHTML = `
                     <div class="empty-gallery">
                         <div class="empty-gallery-icon">📷</div>
@@ -1048,115 +799,33 @@
             
             galleryGrid.innerHTML = '';
             
-            photos.forEach((photo, index) => {
+            uploadedPhotos.forEach((photo, index) => {
                 const galleryItem = document.createElement('div');
                 galleryItem.className = 'gallery-item';
                 galleryItem.innerHTML = `
-                    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, 
-                        ${getRandomGradient()}); display: flex; align-items: center; justify-content: center; font-size: 60px;">
-                        ${getRandomEmoji()}
-                    </div>
+                    <img src="${photo.dataUrl}" class="gallery-img" alt="Photo">
                     <div class="photo-info">
                         <div class="uploader-name">📤 ${photo.uploaderName}</div>
-                        <div class="photo-actions">
-                            <button class="download-btn" onclick="downloadPhoto(${index})">
-                                İndir
-                            </button>
-                        </div>
+                        <button class="download-btn" onclick="downloadPhoto(${index})">
+                            İndir
+                        </button>
                     </div>
                 `;
                 galleryGrid.appendChild(galleryItem);
             });
         }
 
-        // Random gradient generator
-        function getRandomGradient() {
-            const gradients = [
-                '#667eea, #764ba2',
-                '#ffeaa7, #fdcb6e',
-                '#a29bfe, #6c5ce7',
-                '#fab1a0, #e17055',
-                '#81ecec, #74b9ff',
-                '#fd79a8, #e84393'
-            ];
-            return gradients[Math.floor(Math.random() * gradients.length)];
-        }
-
-        // Random emoji generator
-        function getRandomEmoji() {
-            const emojis = ['📸', '🎉', '💑', '❤️', '🌟', '🎊', '💐', '🥳'];
-            return emojis[Math.floor(Math.random() * emojis.length)];
-        }
-
         // Fotoğraf indirme
         function downloadPhoto(index) {
-            const photos = JSON.parse(localStorage.getItem('weddingPhotos') || '[]');
-            
-            if (photos[index]) {
-                // Gerçek uygulamada Firebase Storage URL'inden indirilecek
-                showMessage('İndirme başlatıldı!', 'success');
-                
-                // Simüle edilmiş indirme
+            const photo = uploadedPhotos[index];
+            if (photo) {
                 const link = document.createElement('a');
-                link.href = photos[index].url || '#';
-                link.download = photos[index].fileName;
+                link.href = photo.dataUrl;
+                link.download = `nisan_foto_${photo.uploaderName}_${photo.id}.jpg`;
                 link.click();
+                showMessage('✓ İndirme başlatıldı!', 'success');
             }
         }
-
-        // Google Auth işlemleri (CLIENT_ID ve API_KEY eklendiğinde çalışacak)
-        function handleAuthClick() {
-            if (!CLIENT_ID || CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com') {
-                showMessage('Google API ayarları yapılmamış! Lütfen dokümantasyonu kontrol edin.', 'error');
-                return;
-            }
-            
-            // Google Sign-In implementation
-            tokenClient.callback = async (resp) => {
-                if (resp.error !== undefined) {
-                    throw (resp);
-                }
-                document.getElementById('authRequiredUpload').style.display = 'none';
-                document.getElementById('authRequiredGallery').style.display = 'none';
-                showMessage('Google ile giriş başarılı!', 'success');
-            };
-
-            if (gapi.client.getToken() === null) {
-                tokenClient.requestAccessToken({prompt: 'consent'});
-            } else {
-                tokenClient.requestAccessToken({prompt: ''});
-            }
-        }
-
-        // Sayfa yüklendiğinde karşılama fotoğrafı ekle
-        function loadWelcomeImage() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const imageUrl = event.target.result;
-                        document.getElementById('welcomeImage').innerHTML = `<img src="${imageUrl}" alt="Welcome">`;
-                        localStorage.setItem('welcomeImageUrl', imageUrl);
-                        config.welcomeImageUrl = imageUrl;
-                        showMessage('Karşılama fotoğrafı güncellendi!', 'success');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            
-            // Welcome image'e tıklandığında dosya seçiciyi aç
-            document.getElementById('welcomeImage').onclick = function() {
-                if (confirm('Karşılama fotoğrafını değiştirmek ister misiniz?')) {
-                    input.click();
-                }
-            };
-        }
-
-        // Sayfa yüklendiğinde çalıştır
-        document.addEventListener('DOMContentLoaded', function() {
-            loadWelcomeImage();
-        });
+    </script>
+</body>
+</html>
