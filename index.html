@@ -500,8 +500,8 @@
             <div class="welcome-image-placeholder">❤️</div>
         </div>
         <div class="welcome-text">
-            <h1 class="couple-names">Ayşe & Mehmet</h1>
-            <p class="event-date">15 Şubat 2025</p>
+            <h1 class="couple-names">Sinem & Doğuş</h1>
+            <p class="event-date">13 Eylül 2025</p>
             <p class="welcome-message">Mutluluğumuzu paylaştığınız için teşekkür ederiz</p>
         </div>
         <div class="action-buttons">
@@ -816,7 +816,7 @@
         }
 
         // Fotoğraf indirme
-        function downloadPhoto(index) {
+        window.downloadPhoto = function(index) {
             const photo = uploadedPhotos[index];
             if (photo) {
                 const link = document.createElement('a');
@@ -826,6 +826,25 @@
                 showMessage('✓ İndirme başlatıldı!', 'success');
             }
         }
+
+        // Sayfa tamamen yüklendiğinde çalıştır
+        window.onload = function() {
+            loadPhotosFromStorage();
+            
+            // Dosya input event listener
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) {
+                fileInput.addEventListener('change', handleFileSelect);
+            }
+
+            // Upload area drag & drop
+            const uploadArea = document.getElementById('uploadArea');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', handleDragOver);
+                uploadArea.addEventListener('dragleave', handleDragLeave);
+                uploadArea.addEventListener('drop', handleDrop);
+            }
+        };
     </script>
 </body>
 </html>
