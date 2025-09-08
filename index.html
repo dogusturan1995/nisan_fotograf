@@ -505,7 +505,6 @@
     </style>
 </head>
 <body>
-    <!-- Karşılama Ekranı -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-image" id="welcomeImage">
             <div class="welcome-image-placeholder">💑</div>
@@ -525,7 +524,6 @@
         </div>
     </div>
 
-    <!-- Fotoğraf Yükleme Ekranı -->
     <div class="upload-screen" id="uploadScreen">
         <div class="header">
             <button class="back-btn" onclick="showWelcomeScreen()">← Geri</button>
@@ -546,14 +544,13 @@
             <div class="preview-container" id="previewContainer">
                 <h3 style="color: #764ba2; margin-bottom: 15px;">Seçilen Fotoğraflar:</h3>
                 <div class="preview-grid" id="previewGrid"></div>
-                <button class="upload-final-btn" id="uploadBtn" onclick="uploadPhotos()">
+                <button class="upload-final-btn" id="uploadBtn" onclick="uploadPhotos()" disabled>
                     Fotoğrafları Yükle
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Galeri Ekranı -->
     <div class="gallery-screen" id="galleryScreen">
         <div class="header">
             <button class="back-btn" onclick="showWelcomeScreen()">← Geri</button>
@@ -568,13 +565,11 @@
         </div>
     </div>
 
-    <!-- Loading Spinner -->
     <div class="loading-spinner" id="loadingSpinner">
         <div class="spinner"></div>
         <div class="loading-text" id="loadingText">Yükleniyor...</div>
     </div>
 
-    <!-- Message -->
     <div class="message" id="message"></div>
 
     <script>
@@ -682,16 +677,17 @@
             updatePreviewVisibility();
         }
 
-        // Önizleme alanı görünürlüğü
+        // Önizleme alanı görünürlüğü - DÜZELTİLEN FONKSİYON
         function updatePreviewVisibility() {
             const previewContainer = document.getElementById('previewContainer');
             const uploadBtn = document.getElementById('uploadBtn');
             
             if (selectedFiles.length > 0) {
                 previewContainer.style.display = 'block';
-                uploadBtn.disabled = false;
+                uploadBtn.disabled = false; // Fotoğraf varsa butonu AKTİF yap
             } else {
                 previewContainer.style.display = 'none';
+                uploadBtn.disabled = true; // Fotoğraf yoksa butonu PASİF yap
             }
         }
 
@@ -765,7 +761,7 @@
                     // Google Apps Script'e gönder
                     await fetch(SCRIPT_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
+                        mode: 'no-cors', // Bu modda yanıt alınamaz, sadece istek gönderilir.
                         headers: {
                             'Content-Type': 'application/json'
                         },
@@ -788,7 +784,6 @@
                 document.getElementById('fileInput').value = '';
                 document.getElementById('uploaderName').value = '';
                 updatePreviewVisibility();
-                document.getElementById('uploadBtn').disabled = false;
                 
                 // 2 saniye sonra galeriye git
                 setTimeout(() => {
