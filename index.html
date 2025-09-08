@@ -804,74 +804,70 @@
         }
 
         // Galeri fotoğraflarını yükle
-        async function loadGalleryPhotos() {
-            const galleryGrid = document.getElementById('galleryGrid');
+async function loadGalleryPhotos() {
+    const galleryGrid = document.getElementById('galleryGrid');
+    galleryGrid.innerHTML = `
+        <div class="empty-gallery">
+            <div class="empty-gallery-icon">⏳</div>
+            <h3>Fotoğraflar yükleniyor...</h3>
+            <p>Google Drive'dan alınıyor</p>
+        </div>
+    `;
+    
+    try {
+        // Google Apps Script'ten fotoğrafları al
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        
+        if (!data.success || !data.photos || data.photos.length === 0) {
             galleryGrid.innerHTML = `
                 <div class="empty-gallery">
-                    <div class="empty-gallery-icon">⏳</div>
-                    <h3>Fotoğraflar yükleniyor...</h3>
-                    <p>Google Drive\'dan alınıyor</p>
+                    <div class="empty-gallery-icon">📷</div>
+                    <h3>Henüz fotoğraf yüklenmemiş</h3>
+                    <p>İlk fotoğrafı yükleyen siz olun!</p>
                 </div>
             `;
-            
-            try {
-                // Google Apps Script'ten fotoğrafları al
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
-                
-                if (!data.success || !data.photos || data.photos.length === 0) {
-                    galleryGrid.innerHTML = `
-                        <div class="empty-gallery">
-                            <div class="empty-gallery-icon">📷</div>
-                            <h3>Henüz fotoğraf yüklenmemiş</h3>
-                            <p>İlk fotoğrafı yükleyen siz olun!</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                galleryGrid.innerHTML = '';
-                
-                // Fotoğrafları göster
-                data.photos.forEach((photo) => {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item';
-                    
-                    // İsmi dosya adından çıkar
-                    const uploaderName = photo.name.split('_')[0] || 'Misafir';
-                    
-                    // Direkt görüntülenebilir link oluştur (eğer gelmiyorsa)
-                    const imageUrl = photo.url.includes('export=view') 
-                        ? photo.url 
-                        : `https://drive.google.com/uc?export=view&id=${photo.id}`;
-                    
-                    const downloadUrl = photo.downloadUrl || `https://drive.google.com/uc?export=download&id=${photo.id}`;
-                    
-                    galleryItem.innerHTML = `
-                        <img src="${imageUrl}" class="gallery-img" alt="Photo" 
-                             loading="lazy"
-                             onerror="this.onerror=null; this.src='https://drive.google.com/uc?export=view&id=${photo.id}';">
-                        <div class="photo-info">
-                            <div class="uploader-name">📤 ${uploaderName}</div>
-                            <a href="${downloadUrl}" download="${photo.name}">
-                                <button class="download-btn">İndir</button>
-                            </a>
-                        </div>
-                    `;
-                    galleryGrid.appendChild(galleryItem);
-                });
-                
-            } catch (error) {
-                console.error('Gallery load error:', error);
-                galleryGrid.innerHTML = `
-                    <div class="empty-gallery">
-                        <div class="empty-gallery-icon">⚠️</div>
-                        <h3>Fotoğraflar yüklenemedi</h3>
-                        <p>Lütfen sayfayı yenileyin</p>
-                    </div>
-                `;
-            }
+            return;
         }
-    </script>
-</body>
-</html>
+        
+        galleryGrid.innerHTML = '';
+        
+        // Fotoğrafları göster
+        data.photos.forEach((photo) => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            
+            const uploaderName = photo.name.split('_')[0] || 'Misafir';
+            
+            // Önce thumbnail (hızlı yüklenir), hata olursa tam boyuta düşer
+            const imageUrl = photo.thumbUrl || photo.url || 
+                             `https://drive.google.com/uc?export=view&id=${photo.id}`;
+            
+            const downloadUrl = photo.downloadUrl || 
+                                `https://drive.google.com/uc?export=download&id=${photo.id}`;
+            
+            galleryItem.innerHTML = `
+                <img src="${imageUrl}" class="gallery-img" alt="Photo" 
+                     loading="lazy"
+                     onerror="this.onerror=null; this.src='https://drive.google.com/uc?export=view&id=${photo.id}';">
+                <div class="photo-info">
+                    <div class="uploader-name">📤 ${uploaderName}</div>
+                    <a href="${downloadUrl}" download="${photo.name}">
+                        <button class="download-btn">İndir</button>
+                    </a>
+                </div>
+            `;
+            galleryGrid.appendChild(galleryItem);
+        });
+        
+    } catch (error) {
+        console.error('Gallery load error:', error);
+        galleryGrid.innerHTML = `
+            <div class="empty-gallery">
+                <div class="empty-gallery-icon">⚠️</div>
+                <h3>Fotoğraflar yüklenemedi</h3>
+                <p>Lütfen sayfayı yenileyin</p>
+            </div>
+        `;
+    }
+}
