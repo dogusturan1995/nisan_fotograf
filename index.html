@@ -932,9 +932,15 @@
 
         // Galeri fotoğraflarını yükle
         async function loadGalleryPhotos() {
-            if (!SCRIPT_URL) {
-                showMessage('⚠️ Google Apps Script URL\'si eksik!', 'error');
-                showSettings();
+            if (!SCRIPT_URL || SCRIPT_URL === 'BURAYA_GOOGLE_APPS_SCRIPT_URL_YAPISTIN') {
+                const galleryGrid = document.getElementById('galleryGrid');
+                galleryGrid.innerHTML = `
+                    <div class="empty-gallery">
+                        <div class="empty-gallery-icon">⚠️</div>
+                        <h3>Sistem yapılandırılmamış</h3>
+                        <p>Lütfen yöneticiyle iletişime geçin</p>
+                    </div>
+                `;
                 return;
             }
             
